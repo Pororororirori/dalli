@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>달리 표현할 수 없어요 - 음정 연습 v011</title>
+<title>달리 표현할 수 없어요 - 음정 연습 v012</title>
 <style>
 :root{
   --bg:#080b10;--panel:#0e141e;--panel2:#070c13;--line:#263044;
@@ -109,9 +109,10 @@ video{display:none}
    <div class="legend">
     <span class="key"><i class="dot targetDot"></i>가수 목표 음정</span>
     <span class="key"><i class="dot meDot"></i>내 음정</span>
-    <span>음원/MR 자동 타이밍 맞춤 · 한 글자 안 음 변화 표시</span>
+    <span>음원/MR 자동 타이밍 맞춤 · 고정 음정축 · 한 글자 안 음 변화 표시</span>
    </div>
    <div class="canvasWrap"><canvas id="pitchCanvas"></canvas></div>
+   <div style="text-align:right;color:#657387;font-size:11px;margin-top:6px">고정 음역: 시2 ~ 라4</div>
    <div class="noteHelp">▲가 붙은 글자는 조금 더 또렷하게 강조합니다. 호흡 표시는 현재 줄을 다 부른 직후의 권장 호흡입니다.</div>
   </div>
 
@@ -166,7 +167,7 @@ let loop=true,currentSeg=-999,rendered=[],judged=new Map();
 let stream=null,audioCtx=null,analyser=null,timeBuf=null,freqBuf=null,prevFreq=null,micOn=false;
 let noiseFloor=.006,prevVoice=false,prevRms=0,lastOnset=-99;
 let midiWindow=[],smoothMidi=null,lastValidMidi=null,lastPitchTime=-99,micTrail=[];
-let centerMidi=58;
+const FIXED_LOW_MIDI=47, FIXED_HIGH_MIDI=69;
 
 const noteNames=["도","도♯","레","레♯","미","파","파♯","솔","솔♯","라","라♯","시"];
 
@@ -455,10 +456,9 @@ function drawPitch(fileT){
 
  const info=activeInfo(fileT);
  const target=info?.u?.targetNotes?.length ? info.u.targetNotes[0].midi : info?.u?.targetMidi;
- if(Number.isFinite(target))centerMidi+=(target-centerMidi)*.07;
- else if(smoothMidi!=null)centerMidi+=(smoothMidi-centerMidi)*.02;
-
- const low=Math.floor(centerMidi)-7,high=low+14;
+ // 세로 음정축은 곡 진행과 상관없이 고정합니다.
+ // 목표 음이 높아지거나 낮아져도 화면 자체가 위아래로 움직이지 않습니다.
+ const low=FIXED_LOW_MIDI,high=FIXED_HIGH_MIDI;
  const labelW=62,left=labelW,right=w-12,top=58,bottom=h-18;
  const pw=right-left,ph=bottom-top;
  const t0=fileT-1.15,t1=fileT+3.75;
